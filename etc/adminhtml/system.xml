@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="availabilitystatus" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="backorder" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="id_0" sortOrder="0" showInDefault="0" showInWebsite="0" showInStore="0">
+                    <label>backorder_id_0</label>
+                </field>
+                <field id="id_1" sortOrder="0" showInDefault="0" showInWebsite="0" showInStore="0">
+                    <label>backorder_id_0</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

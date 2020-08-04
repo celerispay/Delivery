@@ -1,0 +1,25 @@
+{
+    "name": "boostsales/delivering",
+    "description": "Delivery and stock level module",
+    "type": "magento2-module",
+    "version": "1.0",
+    "license": "proprietary",
+
+    "require": {
+        "magento/product-community-edition": "2.3.2"
+    },
+
+    "authors": [{
+        "name": "Newgen payments",
+        "email": "info@newgenpayments.com"
+    }],
+
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Boostsales\\Delivering\\": ""
+        }
+    }
+}
