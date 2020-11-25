@@ -6,7 +6,7 @@
     "license": "proprietary",
 
     "require": {
-        "magento/product-community-edition": "^2.4.0"
+        "magento/product-community-edition": ">=2.3.2"
     },
 
     "authors": [{
