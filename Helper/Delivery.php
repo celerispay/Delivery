@@ -93,8 +93,8 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
             $html .= $message["message"];
         }
         if ($delay >= 0 && $delay != null) {
+            $html .= '<img title="' . $delay["message"] . '" src="' . $this->getImglink($delay['id']) . '" style="margin-top: 5px;width:20px;height:20px;"/>';
             $html .= '<span>' . $delay["message"] . '</span>';
-            $html .= '<img title="' . $delay["message"] . '" src="' . $this->getImglink($delay['id']) . '" style="margin-top: 5px;"/>';
         }
         return $html;
     }
