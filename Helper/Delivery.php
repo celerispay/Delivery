@@ -100,11 +100,11 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     private function getLeadTimeRangeValue($days, $storeId)
-    {
+    {                                
         for ($i = 0; $i < 10; $i++) {
             $from = $this->_config->getSetting('backorder/from_' . $i, $storeId);
             $to = $this->_config->getSetting('backorder/to_' . $i, $storeId);
-            if (($from <= $days) && ($days <= $to)) {
+            if (($from <= $days) && ($days < $to)) {
                 $backOrderMessage = $this->_config->getSetting('backorder/message_' . $i, $storeId);
                 return array("id" => $i, "message" => $backOrderMessage);
             }
