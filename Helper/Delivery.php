@@ -82,7 +82,7 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
     private function getInstockHtml($message)
     {
         $Img = $this->getImglink(null);
-        $html = $message["message"] . '<img title="inStock" src="' . $Img . '" style="margin-top: 5px;width:20px;height:20px;"/>';
+        $html = '<img title="inStock" src="' . $Img . '" style="margin-top: 5px;width:20px;height:20px;"/>' .$message["message"];
         return $html;
     }
 
@@ -94,7 +94,7 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
         }
         if ($delay >= 0 && $delay != null) {
             $html .= '<img title="' . $delay["message"] . '" src="' . $this->getImglink($delay['id']) . '" style="margin-top: 5px;width:20px;height:20px;"/>';
-            $html .= '<span>' . $delay["message"] . '</span>';
+            $html .= '<span class="delay-message-'.$delay['id'].'">' . $delay["message"] . '</span>';
         }
         return $html;
     }
