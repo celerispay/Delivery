@@ -1,6 +1,7 @@
 <?php
 
 namespace Boostsales\Delivering\Helper;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 
 class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -10,6 +11,7 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_coreRegistry;
     protected $_storeManager;
     protected $_supplierProductCollectionFactory;
+    protected $productRepository;
 
     public function __construct(
         \Magento\Framework\Registry $registry,
@@ -17,7 +19,8 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
         \BoostMyShop\AdvancedStock\Model\ResourceModel\Warehouse\Item\CollectionFactory $warehouseItemCollectionFactory,
         \BoostMyShop\AvailabilityStatus\Model\AvailabilityStatus $availabilityStatus,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \BoostMyShop\Supplier\Model\ResourceModel\Supplier\Product\CollectionFactory $supplierProductCollectionFactory
+        \BoostMyShop\Supplier\Model\ResourceModel\Supplier\Product\CollectionFactory $supplierProductCollectionFactory,
+        ProductRepositoryInterface $productRepository
     ) {
         $this->_coreRegistry = $registry;
         $this->_config = $config;
@@ -25,6 +28,7 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_availabilityStatus = $availabilityStatus;
         $this->_supplierProductCollectionFactory = $supplierProductCollectionFactory;
         $this->_storeManager = $storeManager;
+        $this->productRepository = $productRepository;
     }
 
     public function getProductId()
@@ -42,13 +46,14 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->_warehouseItemCollectionFactory
             ->create()
             ->addProductFilter($productId)
+            ->addBackorderFilter()
             ->addInStockFilter()
             ->joinWarehouse()
             ->addVisibleOnFrontFilter();
     }
 
     public function getAvailableStock($productId)
-    {
+    {   
         $availabelStock = 0;
 
         if ($productId) {
@@ -117,6 +122,11 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
         if ($qty > 0) {
             return $delay;
         }
+
+        $backorderStatus = $this->checkMagentoBackorderStatus($productId);
+        if($backorderStatus == 0){
+            return $delay;
+        }
         $collection = $this->_supplierProductCollectionFactory->create()->getSuppliers($productId);
         foreach ($collection as $item) {
             if ($item->getsp_shipping_delay()) {
@@ -129,6 +139,12 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
             }
             return $delay;
         }
+    }
+    private function checkMagentoBackorderStatus($productId){
+        
+        $product = $this->productRepository->getById($productId);
+        $backorderStatus = $product->getExtensionAttributes()->getStockItem()->getBackorders();
 
+        return $backorderStatus;
     }
 }
