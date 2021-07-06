@@ -36,6 +36,7 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
         $product = $this->_coreRegistry->registry('product');
         return $product ? $product->getId() : null;
     }
+
     private function getStore()
     {
         return $this->_storeManager->getStore();
@@ -46,14 +47,11 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->_warehouseItemCollectionFactory
             ->create()
             ->addProductFilter($productId)
-            ->addBackorderFilter()
-            ->addInStockFilter()
-            ->joinWarehouse()
-            ->addVisibleOnFrontFilter();
+            ->addInStockFilter();
     }
 
     public function getAvailableStock($productId)
-    {   
+    {
         $availabelStock = 0;
 
         if ($productId) {
@@ -73,15 +71,15 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getDeliveryHtml($productId)
     {
-        $availableQty = $this->getAvailableStock($productId);
+        $availableQty = $this->getAvailableStock($productId); 
         $storeId = $this->getStore()->getId();
         $stockMessage = $this->_availabilityStatus->getAvailability($productId, $storeId);
         if ($availableQty > 0) {
             return $this->getInstockHtml($stockMessage);
         } elseif (!$this->_availabilityStatus->productIsAvailable($productId)) {
-            return $this->getImageHtml($stockMessage, $this->getSupplierShippingDelay($storeId, $availableQty, $productId));
+            return  $this->_availabilityStatus->getOutOfStockMessage($productId, $storeId)['message'];
         } elseif ($availableQty == 0) {
-            return $this->getImageHtml(null, $this->getSupplierShippingDelay($storeId, $availableQty, $productId));
+            return $this->getImageHtml($stockMessage, $this->getSupplierShippingDelay($storeId, $availableQty, $productId));
         }
     }
     private function getInstockHtml($message)
@@ -94,12 +92,13 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
     private function getImageHtml($message = null, $delay)
     {
         $html = '';
-        if ($message) {
-            $html .= $message["message"];
-        }
         if ($delay >= 0 && $delay != null) {
             $html .= '<img title="' . $delay["message"] . '" src="' . $this->getImglink($delay['id']) . '" style="margin-top: 5px;width:20px;height:20px;"/>';
             $html .= '<span class="delay-message-'.$delay['id'].'">' . $delay["message"] . '</span>';
+        }else {
+            if ($message) {
+                $html .= $message["message"];
+            }
         }
         return $html;
     }
@@ -109,7 +108,7 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
         for ($i = 0; $i < 10; $i++) {
             $from = $this->_config->getSetting('backorder/from_' . $i, $storeId);
             $to = $this->_config->getSetting('backorder/to_' . $i, $storeId);
-            if (($from <= $days) && ($days < $to)) {
+            if (($from <= $days) && ($days <= $to)) {
                 $backOrderMessage = $this->_config->getSetting('backorder/message_' . $i, $storeId);
                 return array("id" => $i, "message" => $backOrderMessage);
             }
@@ -120,11 +119,6 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $delay = null;
         if ($qty > 0) {
-            return $delay;
-        }
-
-        $backorderStatus = $this->checkMagentoBackorderStatus($productId);
-        if($backorderStatus == 0){
             return $delay;
         }
         $collection = $this->_supplierProductCollectionFactory->create()->getSuppliers($productId);
@@ -139,12 +133,5 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
             }
             return $delay;
         }
-    }
-    private function checkMagentoBackorderStatus($productId){
-        
-        $product = $this->productRepository->getById($productId);
-        $backorderStatus = $product->getExtensionAttributes()->getStockItem()->getBackorders();
-
-        return $backorderStatus;
     }
 }
