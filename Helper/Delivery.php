@@ -37,7 +37,7 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
         return $product ? $product->getId() : null;
     }
 
-    private function getStore()
+    public function getStore()
     {
         return $this->_storeManager->getStore();
     }
@@ -71,7 +71,7 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getDeliveryHtml($productId)
     {
-        $availableQty = $this->getAvailableStock($productId); 
+        $availableQty = $this->getAvailableStock($productId);
         $storeId = $this->getStore()->getId();
         $stockMessage = $this->_availabilityStatus->getAvailability($productId, $storeId);
         if ($availableQty > 0) {
@@ -104,7 +104,7 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     private function getLeadTimeRangeValue($days, $storeId)
-    {                                
+    {
         for ($i = 0; $i < 10; $i++) {
             $from = $this->_config->getSetting('backorder/from_' . $i, $storeId);
             $to = $this->_config->getSetting('backorder/to_' . $i, $storeId);
