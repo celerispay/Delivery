@@ -88,7 +88,7 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
         $storeId = $this->getStore()->getId();
         $stockMessage = $this->_availabilityStatus->getAvailability($productId, $storeId);
         if ($availableQty > 0) {
-            return $this->getInstockHtml($stockMessage);
+            return $stockMessage;
         } elseif (!$this->_availabilityStatus->productIsAvailable($productId)) {
             return  $this->_availabilityStatus->getOutOfStockMessage($productId, $storeId)['message'];
         } elseif ($availableQty == 0) {
