@@ -82,6 +82,20 @@ class Delivery extends \Magento\Framework\App\Helper\AbstractHelper
             return $this->getImageHtml($stockMessage, $this->getSupplierShippingDelay($storeId, $availableQty, $productId));
         }
     }
+
+    public function getDeliveryDelayId($productId){
+        $availableQty = $this->getAvailableStock($productId);
+        $storeId = $this->getStore()->getId();
+        $stockMessage = $this->_availabilityStatus->getAvailability($productId, $storeId);
+        if ($availableQty > 0) {
+            return $this->getInstockHtml($stockMessage);
+        } elseif (!$this->_availabilityStatus->productIsAvailable($productId)) {
+            return  $this->_availabilityStatus->getOutOfStockMessage($productId, $storeId)['message'];
+        } elseif ($availableQty == 0) {
+            return $this->getSupplierShippingDelay($storeId, $availableQty, $productId);
+        }
+    }
+
     private function getInstockHtml($message)
     {
         $Img = $this->getImglink(null);
